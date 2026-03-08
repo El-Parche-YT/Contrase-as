@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Generator - Gaming Edition</title>
+    <!-- Fuente Gaming de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
+   
+   
+   <style>
+        :root {
+            --neon-color: #00f3ff;
+            --bg-color: #0a0a0a;
+            --panel-bg: #111;
+            --text-color: #fff;
+            --locked-color: #ff2a2a;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #050505;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 700px;
+            background: rgba(15, 15, 15, 0.96); /* Fondo sólido para rendimiento en gama baja */
+            /* backdrop-filter: blur(10px); REMOVIDO: Causa lag en móviles */
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            padding: 2.5rem;
+            text-align: center;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- NUEVO DISEÑO DE CABECERA (BRANDING) --- */
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem; /* Espacio reducido después de quitar el logo */
+            position: relative;
+        }
+
+        /* Tipografía Avanzada */
+        .channel-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(180deg, #fff 0%, #a5a5a5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            position: relative;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+
+        .channel-name span {
+            color: var(--neon-color);
+            -webkit-text-fill-color: var(--neon-color);
+            text-shadow: 0 0 20px var(--neon-color);
+        }
+
+        .app-title {
+            font-size: 0.9rem;
+            color: var(--neon-color);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            opacity: 0.8;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            padding-bottom: 10px;
+            padding-left: 6px; /* Compensar letter-spacing */
+        }
+
+        /* --- NUEVO DISEÑO DE MONITOR DE VIDEO --- */
+        .monitor-frame {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Esquinas decorativas de neón */
+        .monitor-frame::before, .monitor-frame::after {
+            content: '';
+            position: absolute;
+            width: 25px; height: 25px;
+            border: 2px solid var(--neon-color);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .monitor-frame::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .monitor-frame::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px 8px 4px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .rec-indicator {
+            display: flex;
+            align-items: center;
+            color: #ff2a2a;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff2a2a;
+        }
+        .rec-dot {
+            width: 8px; height: 8px;
+            background: #ff2a2a;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: blinkRec 1s infinite;
+        }
+        @keyframes blinkRec { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
+        /* Ajuste del wrapper interno */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* Ratio 16:9 */
+            height: 0;
+            background: #000;
+            overflow: hidden;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Barra de Estado */
+        .status-bar {
+            background: rgba(255, 255, 255, 0.05);
+            height: 6px;
+            border-radius: 3px;
+            margin: 10px 0 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--neon-color);
+            transition: width 0.3s linear;
+            box-shadow: 0 0 10px var(--neon-color);
+            border-radius: 3px;
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: block;
+            font-family: 'Chakra Petch', sans-serif;
+        }
+
+        /* Sección de la Key (Bloqueada al inicio) */
+        .key-section {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .key-section.locked {
+            filter: blur(5px) grayscale(1);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .key-section.unlocked {
+            border: 1px solid rgba(0, 243, 255, 0.5);
+            filter: blur(0);
+            pointer-events: all;
+            opacity: 1;
+            background: rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+        }
+
+        .key-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .key-display {
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--neon-color);
+            font-size: 1.2rem;
+            padding: 15px 50px 15px 20px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+            text-align: left;
+            font-family: 'Chakra Petch', sans-serif;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+        
+        .key-display:focus {
+            outline: none;
+            border-color: var(--neon-color);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .copy-btn-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--neon-color);
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .copy-btn-icon:hover {
+            background: rgba(0, 243, 255, 0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .copy-btn-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* --- NUEVO BOTÓN DE COPIAR MEJORADO --- */
+        .copy-btn-main {
+            background: var(--neon-color);
+            color: #050505;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            margin-top: 20px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .copy-btn-main:hover {
+            background: #fff;
+            box-shadow: 0 0 40px var(--neon-color);
+            transform: translateY(-3px);
+        }
+
+        .copy-btn-main svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2.5;
+        }
+
+        /* Estilo para el botón del modal (mantenemos la clase copy-btn para compatibilidad) */
+        .copy-btn {
+            background: transparent;
+            color: var(--neon-color);
+            border: 1px solid var(--neon-color);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Chakra Petch', sans-serif;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+        .copy-btn:hover {
+            background: var(--neon-color);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-color);
+        }
+
+        /* Animación de escaneo decorativa */
+        .scan-line {
+            background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.2), transparent);
+            height: 100px;
+            width: 100%;
+            position: absolute; /* Optimización: Sacar del flujo del documento */
+            left: 0;
+            will-change: top; /* Optimización: Avisar al navegador para usar GPU */
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Animación de parpadeo para urgencia */
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .blinking {
+            animation: blink 0.5s infinite; /* Parpadeo rápido */
+            color: #ff003c !important; /* Rojo alerta */
+            text-shadow: 0 0 15px #ff003c;
+        }
+
+        /* Botón de Ayuda */
+        .help-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: bold;
+            z-index: 10;
+            transition: 0.3s;
+        }
+        .help-btn:hover {
+            border-color: var(--neon-color);
+            color: var(--neon-color);
+            box-shadow: 0 0 15px var(--neon-color);
+        }
+
+        /* --- NUEVO MODAL DE AYUDA PROFESIONAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9); /* Fondo oscuro sin blur para rendimiento */
+            /* backdrop-filter: blur(8px); REMOVIDO */
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.visible {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1a1a1a, #111);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 0; /* Padding se maneja en header/body */
+            max-width: 550px;
+            width: 90%;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 243, 255, 0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-header h2 {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            flex-grow: 1;
+        }
+
+        .modal-header-icon {
+            color: var(--neon-color);
+            margin-right: 1rem;
+            animation: pulseIcon 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            color: var(--locked-color);
+            transform: rotate(90deg);
+        }
+        .close-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .modal-body {
+            padding: 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Espacio entre items */
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .instruction-icon {
+            color: var(--neon-color);
+            background: rgba(0, 243, 255, 0.1);
+            min-width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+        .instruction-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .instruction-item p {
+            margin: 0;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+        }
+        .instruction-item p strong {
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        .modal-ok-btn {
+            width: calc(100% - 4rem);
+            margin: 0 2rem 2rem 2rem;
+            border-radius: 5px;
+        }
+
+        /* Animación para el mensaje de gracias */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animación Arcoíris (RGB Gaming) */
+        @keyframes rainbow {
+            /* Optimización: Eliminadas las sombras dinámicas pesadas, solo cambia color */
+            0% { border-color: #ff0000; color: #ff0000; }
+            17% { border-color: #ffff00; color: #ffff00; }
+            33% { border-color: #00ff00; color: #00ff00; }
+            50% { border-color: #00ffff; color: #00ffff; }
+            67% { border-color: #0000ff; color: #0000ff; }
+            83% { border-color: #ff00ff; color: #ff00ff; }
+            100% { border-color: #ff0000; color: #ff0000; }
+        }
+
+        .thanks-message {
+            margin-top: 15px;
+            color: var(--neon-color);
+            font-weight: bold;
+            text-shadow: 0 0 10px var(--neon-color);
+            /* Combinamos la aparición suave con el efecto arcoíris infinito */
+            animation: fadeInUp 0.8s ease-out forwards, rainbow 3s linear infinite;
+            border: 2px solid var(--neon-color);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px var(--neon-color);
+        }
+
+        /* Notificación Personalizada (Toast) */
+        .custom-notification {
+            position: fixed;
+            top: -100px; /* Oculto arriba */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid var(--neon-color);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 30px var(--neon-color), inset 0 0 10px var(--neon-color);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            z-index: 2000;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efecto rebote */
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .custom-notification.show {
+            top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <button class="help-btn" onclick="toggleHelp()">?</button>
+        <div class="scan-line"></div>
+        
+        <!-- NUEVA CABECERA PROFESIONAL -->
+        <div class="brand-header">
+            <div class="channel-name">EL PARCHE <span>YT</span></div>
+            <div class="app-title">GENERADOR DE KEY</div>
+        </div>
+        
+        <!-- Contenedor donde la API de YouTube inyectará el video -->
+        <div class="monitor-frame">
+            <div class="monitor-header">
+                <span>GENERANDO CONTRASEÑA</span>
+                <div class="rec-indicator"><div class="rec-dot"></div>REC</div>
+            </div>
+            <div class="video-wrapper">
+                <div id="player"></div>
+            </div>
+        </div>
+
+        <!-- Barra de progreso visual -->
+        <div class="status-text" id="statusText">ESPERANDO VIDEO...</div>
+        <div class="status-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <!-- Sección de la contraseña -->
+        <div class="key-section locked" id="keySection">
+            <h3>CONTRASEÑA PARA EXTRAER TU PANEL</h3>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Tu clave de acceso:</p>
+            <div class="key-container">
+                <input type="password" class="key-display" id="secretKeyField" value="LOCKED" readonly style="text-align: center; padding: 15px;">
+            </div>
+            <button class="copy-btn-main" id="copyBtn" onclick="copyKey()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                COPIAR KEY
+            </button>
+            <div id="thanksMessage" class="thanks-message" style="display: none;">¡GRACIAS POR PARTICIPAR!</div>
+        </div>
+    </div>
+
+    <!-- Notificación Personalizada -->
+    <div id="customNotification" class="custom-notification">✅ Key Copiada con Éxito</div>
+
+    <!-- Modal de Ayuda -->
+    <div id="helpModal" class="modal visible" style="display: flex;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <svg class="modal-header-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <h2>SYSTEM BRIEFING // INSTRUCCIONES</h2>
+                <button class="close-btn" onclick="toggleHelp()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </div>
+                    <p>Al dar <strong>PLAY</strong>, se abrirá una publicidad. <strong>CIERRA y VUELVE</strong> aquí para que inicie el tiempo.</p>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <p>Visualiza durante <strong>10 segundos</strong>. Si te vas a otra pestaña, el contador podría detenerse.</p>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <p>Al dar click en <strong>COPIAR</strong>, se abrirá otra ventana de publicidad.</p>
+                </div>
+                <div class="instruction-item">
+                    <div class="instruction-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </div>
+                    <p><strong>REGRESA AQUÍ</strong> rápidamente, tu Key ya estará copiada en el portapapeles.</p>
+                </div>
+            </div>
+            <button class="copy-btn modal-ok-btn" onclick="closeHelpWithAd()">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Efecto de sonido (Puedes cambiar el enlace src por tu propio archivo de audio) -->
+    <audio id="unlockSound" src="https://www.myinstants.com/media/sounds/level-up-sound-effect.mp3"></audio>
+    <audio id="copySound" src="https://www.myinstants.com/media/sounds/coin-collect-sound-effect.mp3"></audio>
+    <audio id="startSound" src="https://www.myinstants.com/media/sounds/discord-notification.mp3"></audio>
+
+    <!-- Librería de Confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // ================= CONFIGURACIÓN =================
+        // 1. Pon aquí el ID de tu video de YouTube (lo que va después de v=)
+        const YOUTUBE_VIDEO_ID = '1OvdFZuXVmY'; 
+        
+        // 2. SEGURIDAD AUMENTADA (Encriptación Base64)
+        // Para poner TU propia contraseña:
+        // A. Ve a https://www.base64encode.org/ | B. Escribe tu clave y dale a Encode | C. Pega el resultado abajo.
+        // El código de abajo es "GAMER-2024-PRO-KEY" encriptado:
+        const _0xToken = 'OWs='; // Contraseña "9k" en Base64
+        const LINK_URL = 'https://cuty.io/YhnLBf0'; // Pon aquí tu link de cuty
+        // =================================================
+
+        // Reproducir sonido al cargar la página (cuando sale el modal)
+        window.addEventListener('load', function() {
+            var audio = document.getElementById("startSound");
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log("Audio autoplay bloqueado por el navegador"));
+        });
+
+        // Cargar la API de IFrame de YouTube de forma asíncrona
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var timerInterval;
+        var isUnlocked = false;
+        var watchedTime = 0; // Tiempo real visto en segundos
+        const REQUIRED_TIME = 10; // Tiempo requerido en segundos (10 segundos)
+
+        // Esta función crea el reproductor <iframe> después de que se descarga el código de la API
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                videoId: YOUTUBE_VIDEO_ID,
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 1, // Mostrar controles
+                    'rel': 0       // No mostrar videos relacionados al final
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // Cuando el estado del reproductor cambia
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !isUnlocked) {
+                // Si empieza a reproducir, iniciamos el chequeo
+                startTracking();
+            } else {
+                // Si pausa, dejamos de chequear para ahorrar recursos
+                stopTracking();
+
+                // Mostrar mensaje si se pausa
+                if (event.data == YT.PlayerState.PAUSED && !isUnlocked) {
+                    var st = document.getElementById('statusText');
+                    st.innerText = "SISTEMA PAUSADO";
+                    st.classList.remove('blinking');
+                }
+            }
+        }
+
+        function startTracking() {
+            stopTracking(); // Limpiar intervalo previo si existe
+            timerInterval = setInterval(checkProgress, 1000); // Chequear cada segundo
+        }
+
+        function stopTracking() {
+            clearInterval(timerInterval);
+        }
+
+        function checkProgress() {
+            if(isUnlocked) return;
+
+            // Incrementamos el contador solo si se está reproduciendo
+            // Esto evita que adelanten el video, ya que deben esperar los "ticks" del reloj
+            watchedTime += 1;
+
+            // Calcular porcentaje basado en el tiempo requerido (60s)
+            var progressToUnlock = (watchedTime / REQUIRED_TIME) * 100;
+                if(progressToUnlock > 100) progressToUnlock = 100;
+
+                document.getElementById('progressBar').style.width = progressToUnlock + '%';
+                
+                // Contador regresivo visual
+                var timeLeft = REQUIRED_TIME - watchedTime;
+                if (timeLeft < 0) timeLeft = 0;
+                var mins = Math.floor(timeLeft / 60);
+                var secs = Math.floor(timeLeft % 60);
+                var statusText = document.getElementById('statusText');
+                statusText.innerText = "GENERANDO CONTRASEÑA: " + mins + ":" + (secs < 10 ? "0" : "") + secs;
+
+                // Activar parpadeo si faltan menos de 10 segundos
+                if (timeLeft < 10 && timeLeft > 0) {
+                    statusText.classList.add('blinking');
+                    document.getElementById('progressBar').style.backgroundColor = 'var(--locked-color)';
+                    document.getElementById('progressBar').style.boxShadow = '0 0 15px var(--locked-color)';
+                } else {
+                    statusText.classList.remove('blinking');
+                    document.getElementById('progressBar').style.backgroundColor = 'var(--neon-color)';
+                    document.getElementById('progressBar').style.boxShadow = '0 0 15px var(--neon-color)';
+                }
+
+                // Lógica principal: Si ha cumplido el tiempo requerido
+                if (watchedTime >= REQUIRED_TIME) {
+                    unlockContent();
+                }
+        }
+
+        function unlockContent() {
+            isUnlocked = true;
+            stopTracking();
+            
+            // Reproducir sonido de desbloqueo
+            var audio = document.getElementById("unlockSound");
+            audio.volume = 0.4; // Volumen al 40% para no asustar
+            audio.play().catch(e => console.log("Audio bloqueado por el navegador"));
+
+            // Lanzar animación de confeti estilo Cyberpunk
+            // Optimización: Detectar móvil y reducir partículas
+            var isMobile = window.innerWidth < 768;
+            confetti({
+                particleCount: isMobile ? 50 : 150, // 50 partículas en móvil para evitar lag
+                spread: isMobile ? 50 : 70,
+                origin: { y: 0.6 },
+                colors: ['#00f3ff', '#ff003c', '#ffffff'] // Azul, Rojo y Blanco
+            });
+
+            // Cambios visuales
+            const keySection = document.getElementById('keySection');
+            const progressBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            const keyField = document.getElementById('secretKeyField');
+
+            statusText.classList.remove('blinking'); // Detener parpadeo
+            // Quitar clase locked y poner unlocked
+            keySection.classList.remove('locked');
+            keySection.classList.add('unlocked');
+
+            // Actualizar barra a verde
+            progressBar.style.backgroundColor = 'var(--neon-color)';
+            progressBar.style.boxShadow = '0 0 15px var(--neon-color)';
+            statusText.innerText = "ACCESO COMPLETADO";
+            statusText.style.color = "#000";
+
+            // Insertar la contraseña
+            keyField.value = atob(_0xToken); // Desencriptar automáticamente
+        }
+
+        function triggerAd() {
+            var s1 = document.createElement('script');
+            s1.src = "https://pl28488782.effectivegatecpm.com/78/f7/a3/78f7a36fcf0878c51c7bcefbeb1fa58e.js";
+            document.body.appendChild(s1);
+            var s2 = document.createElement('script');
+            s2.src = "https://pl28488770.effectivegatecpm.com/5b/16/f5/5b16f592723d84c5393f83423791f33d.js";
+            document.body.appendChild(s2);
+        }
+
+        function closeHelpWithAd() {
+            toggleHelp();
+            triggerAd();
+        }
+
+        function copyKey() {
+            triggerAd();
+            var copyText = document.getElementById("secretKeyField");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /* Para móviles */
+            navigator.clipboard.writeText(copyText.value);
+            
+            // Mostrar notificación personalizada
+            var audio = document.getElementById("copySound");
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log("Audio bloqueado"));
+
+            // Vibrar en celulares (200ms)
+            if (navigator.vibrate) navigator.vibrate(200);
+
+            var notif = document.getElementById("customNotification");
+            notif.classList.add("show");
+            // Ocultar automáticamente después de 3 segundos
+            setTimeout(function() {
+                notif.classList.remove("show");
+            }, 3000);
+
+            // Ocultar el botón con animación suave
+            var btn = document.getElementById("copyBtn");
+            btn.style.opacity = "0";
+            btn.style.pointerEvents = "none";
+            
+            // Quitar del layout después de la animación (0.5s)
+            setTimeout(function() {
+                btn.style.display = "none";
+                document.getElementById("thanksMessage").style.display = "block";
+            }, 500);
+        }
+
+        function toggleHelp() {
+            var modal = document.getElementById("helpModal");
+            if (modal.classList.contains('visible')) {
+                modal.classList.remove('visible');
+                // Esperar a que la animación de salida termine para ocultarlo
+                setTimeout(() => {
+                    modal.style.display = "none";
+                }, 300); // 300ms es la duración de la transición de opacidad
+            } else {
+                modal.style.display = "flex";
+                // Pequeño delay para que el navegador aplique el display:flex antes de la transición
+                setTimeout(() => {
+                    modal.classList.add('visible');
+                }, 10);
+            }
+        }
+    </script>
+</body>
+</html>
